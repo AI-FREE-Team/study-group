@@ -11,46 +11,75 @@ jobs:
   update-json:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write  # 確保有寫入權限
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          # 確保抓取的是最新代碼
+          fetch-depth: 0
 
       - name: Update data.json
+        # 將輸入資料轉存為環境變數，避免 shell 的引號解析問題
+        env:
+          INPUT_DATA: ${{ github.event.inputs.entry_data }}
         run: |
           python3 -c "
-          import json, os
-          new_entry = json.loads('${{ github.event.inputs.entry_data }}')
-          
-          # 讀取現有資料
-          if os.path.exists('data.json'):
-              with open('data.json', 'r', encoding='utf-8') as f:
-                  data = json.load(f)
-          else:
-              data = []
+          import json, os, sys
 
-          # 更新或新增
-          updated = False
-          for i, item in enumerate(data):
-              if item['date'] == new_entry['date']:
-                  data[i] = new_entry
-                  updated = True
-                  break
-          if not updated:
-              data.append(new_entry)
+          file_path = 'data.json'
+          try:
+              # 從環境變數讀取 JSON
+              new_entry = json.loads(os.environ['INPUT_DATA'])
+              print(f'Received new entry: {new_entry}')
 
-          # 排序
-          data.sort(key=lambda x: x['date'])
+              # 讀取現有檔案
+              if os.path.exists(file_path):
+                  with open(file_path, 'r', encoding='utf-8') as f:
+                      data = json.load(f)
+              else:
+                  data = []
 
-          # 存回
-          with open('data.json', 'w', encoding='utf-8') as f:
-              json.dump(data, f, indent=2, ensure_ascii=False)
+              # 更新邏輯
+              updated = False
+              for i, item in enumerate(data):
+                  # 依據日期比對，如果日期一樣就覆蓋
+                  if item.get('date') == new_entry['date']:
+                      data[i] = new_entry
+                      updated = True
+                      print(f'Updated existing entry for date: {new_entry[ \"date\" ]}')
+                      break
+              
+              if not updated:
+                  data.append(new_entry)
+                  print(f'Added new entry for date: {new_entry[ \"date\" ]}')
+
+              # 重新排序
+              data.sort(key=lambda x: x['date'])
+
+              # 儲存回檔案
+              with open(file_path, 'w', encoding='utf-8') as f:
+                  json.dump(data, f, indent=2, ensure_ascii=False)
+              
+              print('Successfully wrote to data.json')
+          except Exception as e:
+              print(f'Error processing JSON: {e}')
+              sys.exit(1)
           "
 
       - name: Commit and Push
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # 檢查檔案是否真的有變動
+          git status
+          
           git add data.json
-          git commit -m "📅 更新週曆: ${{ github.event.inputs.entry_data }}" || exit 0
-          git push
+          # 只有在有變動時才 commit，避免空 commit 報錯
+          if git diff --staged --quiet; then
+            echo "No changes detected in data.json. Skipping commit."
+          else
+            git commit -m "📅 Update Calendar: $(date +'%Y-%m-%d %H:%M')"
+            git push origin main
+          fi
