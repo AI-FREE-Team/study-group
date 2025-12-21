@@ -1,0 +1,56 @@
+name: Update Calendar Data
+
+on:
+  workflow_dispatch:
+    inputs:
+      entry_data:
+        description: 'JSON string of the new/updated entry'
+        required: true
+
+jobs:
+  update-json:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Update data.json
+        run: |
+          python3 -c "
+          import json, os
+          new_entry = json.loads('${{ github.event.inputs.entry_data }}')
+          
+          # 讀取現有資料
+          if os.path.exists('data.json'):
+              with open('data.json', 'r', encoding='utf-8') as f:
+                  data = json.load(f)
+          else:
+              data = []
+
+          # 更新或新增
+          updated = False
+          for i, item in enumerate(data):
+              if item['date'] == new_entry['date']:
+                  data[i] = new_entry
+                  updated = True
+                  break
+          if not updated:
+              data.append(new_entry)
+
+          # 排序
+          data.sort(key=lambda x: x['date'])
+
+          # 存回
+          with open('data.json', 'w', encoding='utf-8') as f:
+              json.dump(data, f, indent=2, ensure_ascii=False)
+          "
+
+      - name: Commit and Push
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data.json
+          git commit -m "📅 更新週曆: ${{ github.event.inputs.entry_data }}" || exit 0
+          git push
