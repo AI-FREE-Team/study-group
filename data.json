@@ -1,13 +1,13 @@
 [
   {
     "date": "2025-12-20",
-    "image": "",
+    "image": "https://aifreeteam-app.zeabur.app/static/academy/img/hero.png",
     "speakers": [
       {
-        "name": "test",
-        "topic": "tt123",
-        "summary": "tt456",
-        "link": ""
+        "name": "白博仁",
+        "topic": "flask vs fastapi",
+        "summary": "分享 flash & fastapi 之間的差異",
+        "link": "https://aifreeteam.com"
       }
     ]
   }
