@@ -369,7 +369,7 @@
         status.innerHTML = `<div class="alert alert-info py-2 small">正在透過 API 發送更新請求至 GitHub...</div>`;
 
         try {
-            const res = await fetch(`https://api.github.com/repos/你的帳號/你的Repo/actions/workflows/update_calendar.yml/dispatches`, {
+            const res = await fetch(`https://api.github.com/repos/AI-FREE-Team/study-group/actions/workflows/update_calendar.yml/dispatches`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github.v3+json' },
                 body: JSON.stringify({ ref: 'main', inputs: { entry_data: JSON.stringify(payload) } })
@@ -391,4 +391,5 @@
 <!-- 加入動畫效果 -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 </body>
+
 </html>
