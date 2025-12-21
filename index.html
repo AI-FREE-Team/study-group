@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>讀書會維護系統</title>
+    <title>AI . FREE Team 讀書會系統</title>
     <!-- Bootstrap 5 & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
@@ -167,8 +167,8 @@
 <!-- Header Section -->
 <header class="app-header text-center">
     <div class="container">
-        <h1 class="display-5 fw-bold"><span class="text-ai">Study</span><span class="text-free">Group</span></h1>
-        <p class="text-team fw-semibold">讀書會週曆維護系統</p>
+        <h1 class="display-5 fw-bold"><span class="text-ai">AI </span>. <span class="text-free"> FREE</span> Study Group</h1>
+        <p class="text-team fw-semibold">自由團隊讀書會系統</p>
     </div>
 </header>
 
@@ -177,7 +177,7 @@
     <button class="nav-btn" onclick="changeWeek(-7)"><i class="bi bi-chevron-left"></i></button>
     <div class="px-4 text-center">
         <div id="display-date" class="h5 fw-bold mb-0">2025-12-20</div>
-        <small class="text-team">週六分享安排</small>
+        <small class="text-team">當週主題</small>
     </div>
     <button class="nav-btn" onclick="changeWeek(7)"><i class="bi bi-chevron-right"></i></button>
 </div>
@@ -191,13 +191,13 @@
 
 <!-- 管理側邊欄按鈕 -->
 <button class="btn btn-ai admin-trigger fw-bold" data-bs-toggle="offcanvas" data-bs-target="#adminSidebar">
-    <i class="bi bi-sliders me-2"></i> 管理模式
+    <i class="bi bi-sliders me-2"></i> 讀書會安排
 </button>
 
 <!-- 管理側邊欄 -->
 <div class="offcanvas offcanvas-end" style="width: 500px;" id="adminSidebar">
     <div class="offcanvas-header border-bottom p-4">
-        <h5 class="fw-bold mb-0 text-ai"><i class="bi bi-gear-fill me-2"></i>管理後台</h5>
+        <h5 class="fw-bold mb-0 text-ai"><i class="bi bi-gear-fill me-2"></i>系統後台</h5>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
     </div>
     <div class="offcanvas-body p-4">
@@ -270,7 +270,7 @@
                 <div class="text-center py-5">
                     <i class="bi bi-calendar-x display-1 text-team" style="opacity: 0.3;"></i>
                     <h3 class="mt-4 fw-bold text-team">本週尚未安排活動</h3>
-                    <p>切換日期或進入管理模式新增內容</p>
+                    <p>切換日期或進入讀書會安排新增分享主題</p>
                 </div>`;
             return;
         }
@@ -288,7 +288,7 @@
                             <div class="speaker-name">${s.name}</div>
                             <h4 class="fw-bold my-2">${s.topic}</h4>
                             <p class="text-secondary mb-3">${s.summary}</p>
-                            ${s.link ? `<a href="${s.link}" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill px-3">查看講義</a>` : ''}
+                            ${s.link ? `<a href="${s.link}" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill px-3">相關連結</a>` : ''}
                         </div>
                     `).join('')}
                 </div>
@@ -393,3 +393,4 @@
 </body>
 
 </html>
+
