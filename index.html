@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>讀書會維護系統</title>
+    <!-- Bootstrap 5 & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --color-ai: #3fb0f0;      /* AI Blue */
+            --color-free: #8dcd49;    /* FREE Green */
+            --color-team: #a5a5a5;    /* TEAM Grey */
+            --bg-body: #f9fbff;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            color: #2d3436;
+        }
+
+        /* 品牌配色應用 */
+        .text-ai { color: var(--color-ai) !important; }
+        .text-free { color: var(--color-free) !important; }
+        .text-team { color: var(--color-team) !important; }
+        .bg-ai { background-color: var(--color-ai) !important; }
+        .bg-free { background-color: var(--color-free) !important; }
+        .btn-ai { background-color: var(--color-ai); color: white; border: none; }
+        .btn-ai:hover { background-color: #3498db; color: white; }
+        .btn-free { background-color: var(--color-free); color: white; border: none; }
+        .btn-free:hover { background-color: #7bb53d; color: white; }
+
+        /* 頁首設計 */
+        .app-header {
+            background: linear-gradient(135deg, white 0%, #f0f7ff 100%);
+            padding: 3rem 0;
+            border-bottom: 1px solid rgba(63, 176, 240, 0.1);
+            margin-bottom: 3rem;
+        }
+
+        .week-switcher {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            background: white;
+            padding: 10px;
+            border-radius: 50px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            width: fit-content;
+            margin: -35px auto 0;
+        }
+
+        .nav-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: none;
+            background: white;
+            color: var(--color-ai);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .nav-btn:hover {
+            background: var(--color-ai);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* 主卡片設計 */
+        .main-card {
+            background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.06);
+            border: 1px solid rgba(165, 165, 165, 0.1);
+        }
+
+        .cover-container {
+            position: relative;
+            height: 400px;
+        }
+
+        .cover-img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+
+        .date-float-badge {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 8px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            color: var(--color-ai);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        /* 講者內容佈局 */
+        .speaker-grid {
+            padding: 50px;
+        }
+
+        .speaker-card {
+            border-left: 5px solid var(--color-free);
+            padding: 20px 30px;
+            background: #fcfdfe;
+            border-radius: 0 20px 20px 0;
+            margin-bottom: 30px;
+            transition: 0.3s;
+        }
+
+        .speaker-card:nth-child(even) {
+            border-left-color: var(--color-ai);
+        }
+
+        .speaker-card:hover {
+            transform: translateX(10px);
+            background: white;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+        }
+
+        .speaker-name {
+            font-weight: 700;
+            color: var(--color-team);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* 管理面板 */
+        .admin-trigger {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            border-radius: 50px;
+            padding: 15px 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        .speaker-input-block {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #eee;
+            position: relative;
+        }
+
+        .form-label { font-weight: 600; font-size: 0.85rem; color: var(--color-team); }
+    </style>
+</head>
+<body>
+
+<!-- Header Section -->
+<header class="app-header text-center">
+    <div class="container">
+        <h1 class="display-5 fw-bold"><span class="text-ai">Study</span><span class="text-free">Group</span></h1>
+        <p class="text-team fw-semibold">讀書會週曆維護系統</p>
+    </div>
+</header>
+
+<!-- Week Switcher -->
+<div class="week-switcher">
+    <button class="nav-btn" onclick="changeWeek(-7)"><i class="bi bi-chevron-left"></i></button>
+    <div class="px-4 text-center">
+        <div id="display-date" class="h5 fw-bold mb-0">2025-12-20</div>
+        <small class="text-team">週六分享安排</small>
+    </div>
+    <button class="nav-btn" onclick="changeWeek(7)"><i class="bi bi-chevron-right"></i></button>
+</div>
+
+<!-- Main Content Area -->
+<div class="container my-5" style="max-width: 960px;">
+    <div id="content-area">
+        <!-- JS 動態渲染內容 -->
+    </div>
+</div>
+
+<!-- 管理側邊欄按鈕 -->
+<button class="btn btn-ai admin-trigger fw-bold" data-bs-toggle="offcanvas" data-bs-target="#adminSidebar">
+    <i class="bi bi-sliders me-2"></i> 管理模式
+</button>
+
+<!-- 管理側邊欄 -->
+<div class="offcanvas offcanvas-end" style="width: 500px;" id="adminSidebar">
+    <div class="offcanvas-header border-bottom p-4">
+        <h5 class="fw-bold mb-0 text-ai"><i class="bi bi-gear-fill me-2"></i>管理後台</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body p-4">
+        <div class="mb-4">
+            <label class="form-label">GITHUB SECRET TOKEN</label>
+            <input type="password" id="gh-token" class="form-control" placeholder="輸入 PAT Token">
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label">活動日期 (週六)</label>
+            <input type="date" id="form-date" class="form-control" onchange="loadExisting(this.value)">
+            <div id="mode-info" class="mt-2 small fw-bold text-center p-2 rounded"></div>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label">主視覺封面 URL</label>
+            <input type="url" id="form-image" class="form-control" placeholder="https://...">
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3 mt-4">
+            <h6 class="fw-bold mb-0">講者資訊</h6>
+            <button class="btn btn-sm btn-outline-primary" onclick="addSpeakerInput()">+ 新增講者</button>
+        </div>
+
+        <div id="speaker-inputs-container">
+            <!-- 動態輸入欄位 -->
+        </div>
+
+        <button class="btn btn-free w-100 py-3 fw-bold mt-4 shadow-sm" onclick="submitData()">
+            <i class="bi bi-cloud-arrow-up-fill me-2"></i>同步更新至 GitHub
+        </button>
+        <div id="status" class="mt-3"></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // --- 假資料設定 ---
+    let db = [
+        {
+            date: "2025-12-20",
+            image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80",
+            speakers: [
+                { name: "王大明", topic: "如何使用 GitHub Actions 自動化讀書會流程", summary: "本次分享將介紹如何透過簡單的 YAML 設定，讓團隊協作更加順暢。", link: "#" },
+                { name: "林小美", topic: "設計系統 (Design Systems) 的建立與維護", summary: "從配色到組件化，建立一套可延續的品牌視覺語言。", link: "#" }
+            ]
+        }
+    ];
+
+    let currentFocusDate = "2025-12-20";
+
+    // --- 初始化 ---
+    async function init() {
+        try {
+            const res = await fetch('data.json?t=' + Date.now());
+            if(res.ok) db = await res.json();
+        } catch(e) {}
+        render();
+    }
+
+    // --- 畫面渲染 ---
+    function render() {
+        document.getElementById('display-date').innerText = currentFocusDate;
+        const area = document.getElementById('content-area');
+        const data = db.find(i => i.date === currentFocusDate);
+
+        if (!data) {
+            area.innerHTML = `
+                <div class="text-center py-5">
+                    <i class="bi bi-calendar-x display-1 text-team" style="opacity: 0.3;"></i>
+                    <h3 class="mt-4 fw-bold text-team">本週尚未安排活動</h3>
+                    <p>切換日期或進入管理模式新增內容</p>
+                </div>`;
+            return;
+        }
+
+        area.innerHTML = `
+            <div class="main-card animate__animated animate__fadeIn">
+                <div class="cover-container">
+                    <img src="${data.image || 'https://via.placeholder.com/1200x600?text=Reading+Club'}" class="cover-img">
+                    <div class="date-float-badge">${data.date}</div>
+                </div>
+                <div class="speaker-grid">
+                    <h2 class="fw-bold mb-5"><i class="bi bi-mic-fill text-ai me-2"></i>分享主題</h2>
+                    ${data.speakers.map(s => `
+                        <div class="speaker-card">
+                            <div class="speaker-name">${s.name}</div>
+                            <h4 class="fw-bold my-2">${s.topic}</h4>
+                            <p class="text-secondary mb-3">${s.summary}</p>
+                            ${s.link ? `<a href="${s.link}" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill px-3">查看講義</a>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>`;
+    }
+
+    // --- 切換週次 ---
+    function changeWeek(days) {
+        let d = new Date(currentFocusDate);
+        d.setDate(d.getDate() + days);
+        currentFocusDate = d.toISOString().split('T')[0];
+        render();
+    }
+
+    // --- 管理功能 ---
+    function addSpeakerInput(data = {}) {
+        const container = document.getElementById('speaker-inputs-container');
+        const div = document.createElement('div');
+        div.className = 'speaker-input-block shadow-sm';
+        div.innerHTML = `
+            <button type="button" class="btn-close position-absolute top-0 end-0 m-2" onclick="this.parentElement.remove()" style="font-size:0.7rem;"></button>
+            <div class="mb-2">
+                <label class="form-label">講者姓名</label>
+                <input type="text" class="form-control s-name" value="${data.name || ''}">
+            </div>
+            <div class="mb-2">
+                <label class="form-label">分享主題</label>
+                <input type="text" class="form-control s-topic" value="${data.topic || ''}">
+            </div>
+            <div class="mb-2">
+                <label class="form-label">內容摘要</label>
+                <textarea class="form-control s-summary" rows="2">${data.summary || ''}</textarea>
+            </div>
+            <div>
+                <label class="form-label">相關連結</label>
+                <input type="url" class="form-control s-link" value="${data.link || ''}">
+            </div>
+        `;
+        container.appendChild(div);
+    }
+
+    function loadExisting(date) {
+        const found = db.find(i => i.date === date);
+        const container = document.getElementById('speaker-inputs-container');
+        const modeInfo = document.getElementById('mode-info');
+        container.innerHTML = "";
+        
+        if (found) {
+            modeInfo.innerText = "✏️ 進入修改模式：已載入現有資料";
+            modeInfo.className = "mt-2 small fw-bold text-center p-2 rounded bg-warning bg-opacity-10 text-warning";
+            document.getElementById('form-image').value = found.image || "";
+            found.speakers.forEach(s => addSpeakerInput(s));
+        } else {
+            modeInfo.innerText = "✨ 進入新增模式：請填寫新活動";
+            modeInfo.className = "mt-2 small fw-bold text-center p-2 rounded bg-success bg-opacity-10 text-success";
+            addSpeakerInput();
+        }
+    }
+
+    async function submitData() {
+        const token = document.getElementById('gh-token').value;
+        const date = document.getElementById('form-date').value;
+        const image = document.getElementById('form-image').value;
+        const status = document.getElementById('status');
+
+        if (!token || !date) return alert("Token 與日期是必填項！");
+
+        const speakerBlocks = document.querySelectorAll('.speaker-input-block');
+        const speakers = Array.from(speakerBlocks).map(el => ({
+            name: el.querySelector('.s-name').value,
+            topic: el.querySelector('.s-topic').value,
+            summary: el.querySelector('.s-summary').value,
+            link: el.querySelector('.s-link').value
+        })).filter(s => s.name);
+
+        const payload = { date, image, speakers };
+
+        status.innerHTML = `<div class="alert alert-info py-2 small">正在透過 API 發送更新請求至 GitHub...</div>`;
+
+        try {
+            const res = await fetch(`https://api.github.com/repos/你的帳號/你的Repo/actions/workflows/update_calendar.yml/dispatches`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github.v3+json' },
+                body: JSON.stringify({ ref: 'main', inputs: { entry_data: JSON.stringify(payload) } })
+            });
+
+            if (res.ok) {
+                status.innerHTML = `<div class="alert alert-success py-2 small">✅ 提交成功！請等候約 60 秒讓網頁更新。</div>`;
+            } else {
+                status.innerHTML = `<div class="alert alert-danger py-2 small">❌ 提交失敗，請檢查 Token 權限。</div>`;
+            }
+        } catch (e) {
+            status.innerHTML = `<div class="alert alert-danger py-2 small">❌ 錯誤: ${e.message}</div>`;
+        }
+    }
+
+    init();
+</script>
+
+<!-- 加入動畫效果 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+</body>
+</html>
