@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "date": "2025-12-20",
+    "image": "",
+    "speakers": [
+      {
+        "name": "test",
+        "topic": "tt123",
+        "summary": "tt456",
+        "link": ""
+      }
+    ]
+  }
+]
