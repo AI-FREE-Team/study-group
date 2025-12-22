@@ -10,5 +10,17 @@
         "link": "https://aifreeteam.com"
       }
     ]
+  },
+  {
+    "date": "2025-12-27",
+    "image": "",
+    "speakers": [
+      {
+        "name": "test",
+        "topic": "test",
+        "summary": "test",
+        "link": ""
+      }
+    ]
   }
 ]
