@@ -247,8 +247,28 @@
             ]
         }
     ];
+    // --- 動態取得當週週六的函式 ---
+    function getThisSaturday() {
+        const now = new Date();
+        const dayOfWeek = now.getDay(); // 0 (週日) 到 6 (週六)
+    
+        // 計算距離週六還有幾天 (週六是 6)
+        // 如果今天是週日(0)，diff = 6；如果今天是週六(6)，diff = 0
+        const diff = 6 - dayOfWeek;
+    
+        const saturday = new Date(now);
+        saturday.setDate(now.getDate() + diff);
+    
+        // 格式化為 YYYY-MM-DD
+        const y = saturday.getFullYear();
+        const m = String(saturday.getMonth() + 1).padStart(2, '0');
+        const d = String(saturday.getDate()).padStart(2, '0');
+    
+        return `${y}-${m}-${d}`;
+    }
 
-    let currentFocusDate = "2025-12-20";
+    // 將變數初始化為動態日期
+    let currentFocusDate = getThisSaturday();
 
     // --- 初始化 ---
     async function init() {
@@ -393,4 +413,5 @@
 </body>
 
 </html>
+
 
